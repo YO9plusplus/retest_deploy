@@ -36,16 +36,7 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           
         run: |
-          # 1. Install Vercel CLI globally
           npm install --global vercel
-          
-          # 2. Link local directory to Vercel project configuration
-          # The PROJECT_ID and ORG_ID environment variables (VERCEL_PROJECT_ID/VERCEL_ORG_ID) 
-          # are automatically used by the Vercel CLI to determine the project.
           vercel pull --yes --environment=production --token=$VERCEL_TOKEN
-
-          # 3. Build the project
           vercel build --prod --token=$VERCEL_TOKEN
-          
-          # 4. Deploy the pre-built project to Vercel Production
           vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
