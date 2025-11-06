@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "build": {
+    "env": {
+      "NODE_ENV": "production"
+    }
+  },
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/"
+    }
+  ],
+  # The output directory must be set to 'dist' to match the Vite build output.
+  "outputDirectory": "dist"
+}
