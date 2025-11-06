@@ -11,6 +11,5 @@
       "dest": "/"
     }
   ],
-  # The output directory must be set to 'dist' to match the Vite build output.
   "outputDirectory": "dist"
 }
