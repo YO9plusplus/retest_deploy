@@ -27,16 +27,25 @@ jobs:
         run: npx vitest run
 
       - name: Deploy to Vercel (Production)
-        # This step only runs if the push is to main/master (not for pull_requests)
+        # Only run deployment on pushes to main/master (after successful tests)
         if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-        uses: vercel/actions@v1
-        with:
-          # Vercel Token is required for deployment
-          token: ${{ secrets.VERCEL_TOKEN }}
-          # Project ID is required for a specific project deployment
-          # The ID is passed to the Vercel Action via environment variables
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          # Org ID is required to identify the team/account
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          # Production deployment flag
-          prod: true
+        env:
+          # Correctly pass secrets as environment variables to the step
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          
+        run: |
+          # 1. Install Vercel CLI globally
+          npm install --global vercel
+          
+          # 2. Link local directory to Vercel project configuration
+          # The PROJECT_ID and ORG_ID environment variables (VERCEL_PROJECT_ID/VERCEL_ORG_ID) 
+          # are automatically used by the Vercel CLI to determine the project.
+          vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+
+          # 3. Build the project
+          vercel build --prod --token=$VERCEL_TOKEN
+          
+          # 4. Deploy the pre-built project to Vercel Production
+          vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
