@@ -1,0 +1,42 @@
+name: CI & Deploy
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run Vitest
+        run: npx vitest run
+
+      - name: Deploy to Vercel (Production)
+        # This step only runs if the push is to main/master (not for pull_requests)
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+        uses: vercel/actions@v1
+        with:
+          # Vercel Token is required for deployment
+          token: ${{ secrets.VERCEL_TOKEN }}
+          # Project ID is required for a specific project deployment
+          # The ID is passed to the Vercel Action via environment variables
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          # Org ID is required to identify the team/account
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          # Production deployment flag
+          prod: true
